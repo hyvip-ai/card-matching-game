@@ -2,18 +2,36 @@
   import Row from "./components/Row.svelte";
   import { getArray } from "./functions/getArray";
   import { onMount } from "svelte";
-  import { clicked } from "./functions/gameLogic";
-  //add a store to stoee move and winnig condition
-
-  const myCards = getArray();
+  import { clicked} from "./functions/gameLogic";
+  import { gameData } from "./store";
+  import WinModal from "./components/WinModal.svelte";
+  let myCards = getArray();
   let cards = [];
+  let game_data = {};
   onMount(() => {
     cards = document.querySelectorAll(".memory_card");
     cards.forEach((card) => {
       card.addEventListener("click", clicked);
     });
+    gameData.subscribe((data) => {
+      game_data = { ...data };
+    });
   });
-  console.log(cards);
+
+  const resetGame = () => {
+    gameData.update((prev) => {
+      return {
+        move: 0,
+        matched: 0,
+      };
+    });
+    cards = document.querySelectorAll(".memory_card");
+    cards.forEach((card) => {
+      card.classList.remove("fliped");
+      card.addEventListener("click", clicked);
+    });
+    myCards = getArray();
+  };
 </script>
 
 <main>
@@ -24,6 +42,14 @@
     {/each}
   </div>
 </main>
+<div class="score_board">
+  <h6>ScoreBoard</h6>
+  <p>Moves : {Math.floor(game_data.move/2)}</p>
+  <p>Matched : {game_data.matched}</p>
+</div>
+{#if game_data.matched === 6}
+  <WinModal on:reset-game={resetGame} />
+{/if}
 
 <style>
   main {
@@ -40,6 +66,20 @@
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     text-align: center;
     padding: 5px 0px;
+  }
+  h6 {
+    color: #ff3e00;
+    font-size: 15px;
+  }
+  .score_board {
+    position: absolute;
+    top: 20%;
+    text-align: center;
+    width: 150px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   .game_container {
     background-color: white;

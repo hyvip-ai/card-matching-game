@@ -1,4 +1,4 @@
-import {writable} from 'svelte'
+import {writable} from 'svelte/store'
 
 export let gameData = writable({
     move:0,

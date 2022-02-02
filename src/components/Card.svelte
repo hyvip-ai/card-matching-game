@@ -1,6 +1,6 @@
 <script>
   export let card = "";
-  let frameWork = card.replace(".svg", "").slice(1);
+  $:frameWork = card.replace(".svg", "").slice(1);
 </script>
 
 <div class="memory_card" data-framework={frameWork}>

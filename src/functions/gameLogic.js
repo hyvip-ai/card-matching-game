@@ -1,36 +1,40 @@
+import { gameData } from "../store";
 let firstCard, secondCard, firstFramework, secondFramework;
 let firstClicked = false;
 let lockBoard = false;
-let moves = 0;
-let cardMatched = 0
+let matched;
 function clicked() {
   if (lockBoard) {
     return;
   }
-  if(this === firstCard){
+  if (this === firstCard) {
     return;
   }
-  countMoves()
   this.classList.add("fliped");
   if (!firstClicked) {
+    console.log("FirstClick");
     firstFramework = this.dataset.framework;
     firstCard = this;
     firstClicked = true;
+    matched = false;
   } else {
     secondCard = this;
     secondFramework = this.dataset.framework;
-    checkCards();
+    matched = checkCards();
     firstClicked = false;
   }
-  return {moves,cardMatched}
+  updateStore(matched);
 }
 function checkCards() {
-  firstFramework === secondFramework ? removeListeners() : resetCards();
+  console.log(firstFramework, secondFramework);
+  return firstFramework === secondFramework ? removeListeners() : resetCards();
 }
 function removeListeners() {
   firstCard.removeEventListener("click", clicked);
   secondCard.removeEventListener("click", clicked);
-  cardMatched++;
+  firstCard = "";
+  secondCard = "";
+  return true;
 }
 function resetCards() {
   lockBoard = true;
@@ -38,10 +42,16 @@ function resetCards() {
     firstCard.classList.remove("fliped");
     secondCard.classList.remove("fliped");
     lockBoard = false;
-  }, 1500);
+    firstCard = "";
+    secondCard = "";
+  }, 1000);
+  return false;
 }
-function countMoves() {
-   moves++;
-   console.log(Math.floor(moves/2))
+function updateStore(matched) {
+  gameData.update((prev) => {
+    return matched
+      ? { ...prev, move: prev.move + 1, matched: prev.matched + 1 }
+      : { ...prev, move: prev.move + 1 };
+  });
 }
-export { clicked, countMoves };
+export { clicked };
