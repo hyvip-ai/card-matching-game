@@ -7,6 +7,9 @@ function clicked() {
   if (lockBoard) {
     return;
   }
+  if(this === firstCard){
+    return;
+  }
   countMoves()
   this.classList.add("fliped");
   if (!firstClicked) {
